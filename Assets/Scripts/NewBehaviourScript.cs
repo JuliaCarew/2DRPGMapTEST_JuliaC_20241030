@@ -12,6 +12,7 @@ public class NewBehaviourScript : MonoBehaviour
     public TileBase setTileBase;
     public TileBase RandomGameofLife;
     public int[,] multidimenionalMap = new int[25, 25];
+
     // create tilemap variable for next gen.
     void Start()
     {
@@ -53,7 +54,7 @@ public class NewBehaviourScript : MonoBehaviour
         {// make array in a grid ranging from -1 to 1
             for (int b = -1; b < 2; b++)
             {
-                var tile = new Vector3Int(a, b); 
+                var tile = new Vector3Int(a, b);
                 /*
                 // check coordinates = -1,-1
                 if(tile == -1,-1)
@@ -67,7 +68,7 @@ public class NewBehaviourScript : MonoBehaviour
                 pos8(1, 0);
                 pos9(1, 1);
                 */
-
+                //multidimenionalMap[-1, -1] = pos1;
             }
         }
     }
