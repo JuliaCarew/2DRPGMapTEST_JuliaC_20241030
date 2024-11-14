@@ -18,7 +18,7 @@ public class NewBehaviourScript : MonoBehaviour
     {
         myCamera = Camera.main;
         myTilemap.SetTile(new Vector3Int(-6, -4, 0), null);
-       
+       // setting initial bounds of array
         for(int x = 0; x < 20; x++)
         {
             for (int y = 0; y < 20; y++)
@@ -29,10 +29,18 @@ public class NewBehaviourScript : MonoBehaviour
         DrawToTileMap();
         //CountNeighbors();
     }
-    void DrawToTileMap()
+    private void Update()
     {
-        for (int x = 0; x < 20; x++)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
+            ApplyRules();
+            DrawToTileMap();
+        }
+    }
+    void DrawToTileMap()
+    { // count X axis to 20
+        for (int x = 0; x < 20; x++)
+        { // count Y axis to 20
             for (int y = 0; y < 20; y++)
             {
                 if (   multidimenionalMap[x, y] == 0 
@@ -48,40 +56,71 @@ public class NewBehaviourScript : MonoBehaviour
             }
         }
     }
-    void CountNeighbors(int x, int y)
+    public bool IsCellAliveCheck(int x, int y)
     {
-        for (int a = -1; a < 2; a++)
-        {// make array in a grid ranging from -1 to 1
-            for (int b = -1; b < 2; b++)
-            {
-                var tile = new Vector3Int(a, b);
-                /*
-                // check coordinates = -1,-1
-                if(tile == -1,-1)
-                pos1(-1, -1);
-                pos2(-1, 0);
-                pos3(-1, 1);
-                pos4(0, -1);
-                pos5(0, 0);
-                pos6(0, 1);
-                pos7(1, -1);
-                pos8(1, 0);
-                pos9(1, 1);
-                */
-                //multidimenionalMap[-1, -1] = pos1;
+        if(x >= 0 && y >= 0 && 
+            x < multidimenionalMap.GetLength(0) && 
+            y < multidimenionalMap.GetLength(1))
+        {
+            return true;
+        }
+        return false;
+    }
+    int CountNeighbors(int x, int y)
+    {
+        int count = 0;
+        // make array in a grid ranging from -1 to 1 ( starts from bottom left)
+        for (int check_x = -1; check_x < 2; check_x++)
+        {
+            for (int check_y = -1; check_y < 2; check_y++)
+            { // so the loop doesnt count the current cell/ itself
+                if (check_y == 0 && check_x == 0)
+                {
+                    continue;
+                }
+                bool resultIsAliveCheck = IsCellAliveCheck(x + check_x, y + check_y);
+                if (resultIsAliveCheck == true)
+                {
+                    count++;
+                }                
             }
         }
+        return count;
     }
-    // create variables for each direction?
+    void ApplyRules()
+    {
+        int[,] multidimenionalMapCHANGES = new int[25, 25];
 
-    // set tile rules (if surrounded by certain number)
-    // if surrounding tiles < 2 it becomes null
-    // if surrounding tiles == 2 || == 3 it lives to next gen.
-    // if surrounding tiles > 3 it becomes null
-    // if tile was null && has surrounding tiles == 3 it lives
+        for (int mapChanges_x = 0; mapChanges_x < 20; mapChanges_x++)
+        { // count Y axis to 20
+            for (int mapChanges_y = 0; mapChanges_y < 20; mapChanges_y++)
+            {
+                multidimenionalMapCHANGES[mapChanges_x, mapChanges_y] = multidimenionalMap[x, y];
+                int countWas = CountNeighbors(x, y);
+                if (IsCellAliveCheck(x, y))
+                {
+                    if (countWas < 2 || countWas > 3)
+                    {
+                        multidimenionalMapCHANGES[mapChanges_x, mapChanges_y] = 0;
+                    }
+                    else if (countWas == 2 || countWas == 3)
+                    {
+                        multidimenionalMapCHANGES[mapChanges_y, mapChanges_x] = 1;
+                    }
+                }
+            }
+            multidimenionalMap = multidimenionalMapCHANGES;
+        }
+    }
+    void DrawMap()
+    {
+        // set tile rules (if surrounded by certain number)
+        // if CountNeighbors < 2 it becomes null
+        // if CountNeighbors == 2 || == 3 it lives to next gen.
+        // if CountNeighbors > 3 it becomes null
+        // if tile was null && CountNeighbors == 3 it lives
+    }
 
     // make new array for 2nd generation, this array is 1st gen, 2nd gen relies on positions of 1st gen.
     // each successive array is dependent on the last
-
-    // resource Rosetta code
 }
